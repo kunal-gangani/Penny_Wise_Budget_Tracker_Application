@@ -13,16 +13,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NavigationController navigation = Get.put(NavigationController());
+    NavigationController navigation = Get.put(
+      NavigationController(),
+    );
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.lightGreen.shade700,
-        onPressed: () {},
-        child: const Icon(
-          Icons.add,
-        ),
-      ),
       backgroundColor: Colors.grey.shade300,
       drawer: customDrawer(),
       appBar: AppBar(
@@ -39,10 +33,10 @@ class HomePage extends StatelessWidget {
           index: value,
         ),
         children: [
-          categoriesComponent(),
-          allCategoriesComponent(),
-          spendingsComponent(),
-          allSpendingComponent(),
+          CategoriesComponent(),
+          AllCategoriesComponent(),
+          const spendingsComponent(),
+          const AllSpendingsComponent(),
         ],
       ),
       bottomNavigationBar: navBar(

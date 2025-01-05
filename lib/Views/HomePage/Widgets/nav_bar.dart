@@ -11,20 +11,20 @@ Widget navBar({required NavigationController controller}) {
       backgroundColor: Colors.lightGreen,
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.category),
-          label: "Category",
+          icon: Icon(Icons.category_outlined),
+          label: "Categories",
         ),
         NavigationDestination(
-          icon: Icon(Icons.receipt_long),
-          label: "All Category",
+          icon: Icon(Icons.folder_shared_outlined),
+          label: "Category Hub",
         ),
         NavigationDestination(
-          icon: Icon(Icons.attach_money),
-          label: "Spending",
+          icon: Icon(Icons.currency_exchange_outlined),
+          label: "Transactions",
         ),
         NavigationDestination(
-          icon: Icon(Icons.payments),
-          label: "All Spending",
+          icon: Icon(Icons.account_balance_wallet_outlined),
+          label: "Accounts",
         ),
       ],
     );

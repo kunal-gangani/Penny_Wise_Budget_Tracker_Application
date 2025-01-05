@@ -40,6 +40,7 @@ dependencies:
   lottie:
   font_awesome_flutter:
   material_design_icons_flutter:
+  sqflite: ^2.4.1
   
 
 dev_dependencies:

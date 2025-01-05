@@ -1,95 +1,159 @@
+import 'package:budget_tracker_app/Controllers/category_controller.dart';
+import 'package:budget_tracker_app/Views/HomePage/Icons/icons.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:get/get.dart';
 
-Widget categoriesComponent() {
-  return Padding(
-    padding: const EdgeInsets.all(16.0),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Explore Categories",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        TextFormField(
-          decoration: InputDecoration(
-            prefixIcon: const Icon(
-              Icons.search,
-              color: Colors.grey,
-            ),
-            hintText: 'Mention Category',
-            hintStyle: const TextStyle(
-              color: Colors.grey,
-            ),
-            fillColor: Colors.white,
-            filled: true,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Colors.lightGreen,
+class CategoriesComponent extends StatelessWidget {
+  final TextEditingController controller = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  CategoriesComponent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final CategoryController value = Get.put(CategoryController());
+
+    return Form(
+      key: formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Explore Categories",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
-          ),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 5,
-              crossAxisSpacing: 5,
+            const SizedBox(
+              height: 10,
             ),
-            itemCount: categoryData.length,
-            itemBuilder: (context, index) {
-              return categoryItems(
-                iconData: categoryData[index]['icon'],
-                label: categoryData[index]['label'],
-                bgColor: categoryData[index]['color'],
-              );
-            },
-          ),
+            TextFormField(
+              controller: controller,
+              validator: (val) =>
+                  val!.isEmpty ? "Oops, this field is required.." : null,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.grey,
+                ),
+                hintText: 'Mention Category',
+                hintStyle: const TextStyle(
+                  color: Colors.grey,
+                ),
+                fillColor: Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: Colors.lightGreen,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                    ),
+                    itemCount: categoryData.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          value.assignIndexToIcon(index: index);
+                        },
+                        child: GetBuilder<CategoryController>(
+                          builder: (controller) {
+                            final iconCode = categoryData[index]['icon'];
+                            final iconData = value.iconMap[iconCode];
+
+                            return categoryItems(
+                              iconData: iconData!,
+                              label: categoryData[index]['label'],
+                              bgColor: categoryData[index]['color'],
+                              isSelected: controller.selectedIndex == index,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: FloatingActionButton(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.lightGreen.shade700,
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          final selectedIconCode =
+                              categoryData[value.selectedIndex!]['icon'];
+                          value.insertData(
+                            title: controller.text,
+                            label: categoryData[value.selectedIndex!]['label'],
+                            iconCode: selectedIconCode,
+                            colorValue: categoryData[value.selectedIndex!]
+                                    ['color']
+                                .value,
+                          );
+                          controller.clear();
+                        }
+                      },
+                      child: const Icon(
+                        Icons.add,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 Widget categoryItems({
   required IconData iconData,
   required String label,
   required Color bgColor,
+  required bool isSelected,
 }) {
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      Container(
-        height: 60,
-        width: 60,
+      AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: isSelected ? 70 : 60,
+        width: isSelected ? 70 : 60,
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: Colors.black,
+            color: isSelected ? Colors.green : Colors.transparent,
+            width: isSelected ? 3 : 1,
           ),
         ),
         child: Icon(
           iconData,
           color: Colors.white,
-          size: 28,
+          size: isSelected ? 32 : 28,
         ),
       ),
       const SizedBox(
@@ -106,116 +170,3 @@ Widget categoryItems({
     ],
   );
 }
-
-List<Map<String, dynamic>> categoryData = [
-  {
-    'icon': FontAwesomeIcons.film,
-    'label': 'Movies',
-    'color': Colors.orange,
-  },
-  {
-    'icon': MdiIcons.school,
-    'label': 'Fees',
-    'color': Colors.blue,
-  },
-  {
-    'icon': FontAwesomeIcons.moneyBill,
-    'label': 'Salary',
-    'color': Colors.green
-  },
-  {
-    'icon': FontAwesomeIcons.car,
-    'label': 'Car',
-    'color': Colors.red,
-  },
-  {
-    'icon': MdiIcons.receipt,
-    'label': 'Bills',
-    'color': Colors.purple,
-  },
-  {
-    'icon': MdiIcons.shopping,
-    'label': 'Shopping',
-    'color': Colors.pink,
-  },
-  {
-    'icon': FontAwesomeIcons.piggyBank,
-    'label': 'Savings',
-    'color': Colors.teal
-  },
-  {
-    'icon': FontAwesomeIcons.utensils,
-    'label': 'Food',
-    'color': Colors.brown,
-  },
-  {
-    'icon': MdiIcons.hospital,
-    'label': 'Medical',
-    'color': Colors.cyan,
-  },
-  {
-    'icon': FontAwesomeIcons.book,
-    'label': 'Books',
-    'color': Colors.lime,
-  },
-  {
-    'icon': MdiIcons.partyPopper,
-    'label': 'Events',
-    'color': Colors.indigo,
-  },
-  {
-    'icon': FontAwesomeIcons.child,
-    'label': 'Kids',
-    'color': Colors.deepOrange,
-  },
-  {
-    'icon': FontAwesomeIcons.dumbbell,
-    'label': 'Fitness',
-    'color': Colors.blueGrey,
-  },
-  {
-    'icon': MdiIcons.beach,
-    'label': 'Travel',
-    'color': Colors.lightBlueAccent,
-  },
-  {
-    'icon': FontAwesomeIcons.house,
-    'label': 'Home',
-    'color': Colors.greenAccent,
-  },
-  {
-    'icon': MdiIcons.babyBottle,
-    'label': 'Baby Care',
-    'color': Colors.deepPurpleAccent,
-  },
-  {
-    'icon': FontAwesomeIcons.gamepad,
-    'label': 'Gaming',
-    'color': Colors.yellow,
-  },
-  {
-    'icon': MdiIcons.toolbox,
-    'label': 'Repairs',
-    'color': Colors.blueAccent,
-  },
-  {
-    'icon': MdiIcons.cellphone,
-    'label': 'Electronics',
-    'color': Colors.grey,
-  },
-  {
-    'icon': FontAwesomeIcons.palette,
-    'label': 'Art',
-    'color': Colors.redAccent,
-  },
-  {
-    'icon': MdiIcons.account,
-    'label': 'Personal',
-    'color': Colors.pinkAccent,
-  },
-  {
-    'icon': FontAwesomeIcons.ellipsis,
-    'label': 'Others',
-    'color': Colors.black54,
-  },
-];
