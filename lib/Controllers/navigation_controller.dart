@@ -15,4 +15,8 @@ class NavigationController extends GetxController {
       curve: Curves.easeInOut,
     );
   }
+
+  void changeNavigation({required int index}) {
+    selectedIndex.value = index;
+  }
 }

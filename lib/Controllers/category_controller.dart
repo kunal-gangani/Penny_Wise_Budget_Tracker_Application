@@ -34,6 +34,12 @@ class CategoryController extends GetxController {
     'FontAwesomeIcons.ellipsis': FontAwesomeIcons.ellipsis,
   };
 
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCategories();
+  }
+
   void assignIndexToIcon({required int index}) {
     selectedIndex = index;
     update();
@@ -80,13 +86,36 @@ class CategoryController extends GetxController {
   }
 
   Future<void> fetchCategories() async {
-    List<Map<String, dynamic>> data = await DbHelper.dbHelper.fetchCatData();
-    allCategories.value = data
-        .map(
-          (categoryData) => CategoryModel.fact(
-            data: categoryData,
-          ),
-        )
-        .toList();
+    try {
+      List<Map<String, dynamic>> data = await DbHelper.dbHelper.fetchCatData();
+      allCategories.value = data
+          .map(
+            (categoryData) => CategoryModel.fact(
+              data: categoryData,
+            ),
+          )
+          .toList();
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to load categories: $e",
+        backgroundColor: Colors.red.shade300,
+      );
+    }
+  }
+
+  Future<void> searchCategory({required String search}) async {
+    try {
+      List<CategoryModel> categories =
+          await DbHelper.dbHelper.fetchMatchingCategories(search: search);
+
+      allCategories.value = categories;
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Search failed: $e",
+        backgroundColor: Colors.red.shade300,
+      );
+    }
   }
 }

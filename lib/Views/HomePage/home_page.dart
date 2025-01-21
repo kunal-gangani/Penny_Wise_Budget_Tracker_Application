@@ -29,13 +29,13 @@ class HomePage extends StatelessWidget {
       ),
       body: PageView(
         controller: navigation.pageController,
-        onPageChanged: (value) => navigation.changePageView(
+        onPageChanged: (value) => navigation.changeNavigation(
           index: value,
         ),
         children: [
           CategoriesComponent(),
-          AllCategoriesComponent(),
-          const spendingsComponent(),
+          const AllCategoriesComponent(),
+          SpendingsComponent(),
           const AllSpendingsComponent(),
         ],
       ),
